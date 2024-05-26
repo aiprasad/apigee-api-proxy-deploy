@@ -42,7 +42,7 @@ jobs:
     - name: Import and Deploy Apigee Proxy
       env:
         APIGEE_ORG: apigee-412820
-        APIGEE_ENV: eval-2
+        APIGEE_ENV: eval
         API_NAME: sample-cloud-logging
         GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
       run: |
@@ -58,4 +58,5 @@ jobs:
           exit 1
         fi
 
-        gcloud apigee apis deploy $REVISION --api=$API_NAME --environment=$APIGEE_ENV 
+        curl -X POST -H "Authorization: Bearer $TOKEN" \
+            "https://apigee.googleapis.com/v1/organizations/$APIGEE_ORG/environments/$APIGEE_ENV/apis/$API_NAME/revisions/$REVISION/deployments"
