@@ -36,14 +36,14 @@ jobs:
     
     - name: Create Proxy Bundle
       run: |
-        cd cloud-logging
+        cd basic-caching
         zip -r ../api_bundle.zip apiproxy/*
     
     - name: Import and Deploy Apigee Proxy
       env:
         APIGEE_ORG: apigee-412820
         APIGEE_ENV: eval
-        API_NAME: sample-cloud-logging
+        API_NAME: basic-caching
         GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
       run: |
         TOKEN=$(gcloud auth print-access-token)
