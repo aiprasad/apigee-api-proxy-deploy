@@ -1,0 +1,64 @@
+name: Deploy Apigee Proxy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v1
+      with:
+        credentials_json: ${{ secrets.GOOGLE_CREDENTIALS }}
+
+    - name: Set up Google Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+      with:
+        project_id: apigee-412820
+    
+    - name: Install Google Cloud CLI
+      run: |
+        curl -O https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-477.0.0-linux-x86_64.tar.gz
+        tar -xf google-cloud-cli-477.0.0-linux-x86_64.tar.gz
+        ./google-cloud-sdk/install.sh --quiet
+
+    - name: Configure gcloud
+      run: |
+        ./google-cloud-sdk/bin/gcloud config set project apigee-412820
+        ./google-cloud-sdk/bin/gcloud config set account github-workflow-SA@apigee-412820.iam.gserviceaccount.com
+    
+    - name: Create Proxy Bundle
+      run: |
+        cd deploy-apigee-proxy
+        zip -r ../api_bundle.zip apiproxy/*
+    
+    - name: Import and Deploy Apigee Proxy
+      env:
+        APIGEE_ORG: apigee-412820
+        APIGEE_ENV: eval-2
+        API_NAME: sample-hello-cicd
+        GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+      run: |
+        TOKEN=$(gcloud auth print-access-token)
+        RESPONSE=$(curl -X POST -H "Authorization: Bearer $TOKEN" \
+          -F "file=@api_bundle.zip" \
+          "https://apigee.googleapis.com/v1/organizations/$APIGEE_ORG/apis?action=import&name=$API_NAME")
+          
+        REVISION=$(echo $RESPONSE | jq -r '.revision')
+        if [ "$REVISION" == "null" ] || [ -z "$REVISION" ]; then
+          echo "Failed to extract the revision number."
+          echo "Response: $RESPONSE"
+          exit 1
+        fi
+
+        echo $REVISION
+
+        curl -X POST -H "Authorization: Bearer $TOKEN" \
+          "https://apigee.googleapis.com/v1/organizations/$APIGEE_ORG/environments/$APIGEE_ENV/apis/$API_NAME/revisions/$REVISION/deployments"
