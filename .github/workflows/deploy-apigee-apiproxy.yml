@@ -45,7 +45,6 @@ jobs:
         APIGEE_ENV: eval-2
         API_NAME: sample-cloud-logging
         GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
-        SERVICE_ACCOUNT_EMAIL: github-workflow-SA@apigee-412820.iam.gserviceaccount.com
       run: |
         TOKEN=$(gcloud auth print-access-token)
         RESPONSE=$(curl -X POST -H "Authorization: Bearer $TOKEN" \
@@ -59,4 +58,4 @@ jobs:
           exit 1
         fi
 
-        gcloud apigee apis deploy $REVISION --api=$API_NAME --environment=$APIGEE_ENV --impersonate-service-account=$SERVICE_ACCOUNT_EMAIL
+        gcloud apigee apis deploy $REVISION --api=$API_NAME --environment=$APIGEE_ENV 
