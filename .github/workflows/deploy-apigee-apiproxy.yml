@@ -1,4 +1,4 @@
-name: Deploy Apigee Proxy
+name: Cloud Loggin  # Name of the Folder used
 
 on:
   push:
@@ -36,14 +36,14 @@ jobs:
     
     - name: Create Proxy Bundle
       run: |
-        cd deploy-apigee-proxy
+        cd cloud-logging
         zip -r ../api_bundle.zip apiproxy/*
     
     - name: Import and Deploy Apigee Proxy
       env:
         APIGEE_ORG: apigee-412820
         APIGEE_ENV: eval-2
-        API_NAME: sample-hello-cicd
+        API_NAME: sample-cloud-logging
         GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
       run: |
         TOKEN=$(gcloud auth print-access-token)
@@ -57,8 +57,6 @@ jobs:
           echo "Response: $RESPONSE"
           exit 1
         fi
-
-        echo $REVISION
 
         curl -X POST -H "Authorization: Bearer $TOKEN" \
           "https://apigee.googleapis.com/v1/organizations/$APIGEE_ORG/environments/$APIGEE_ENV/apis/$API_NAME/revisions/$REVISION/deployments"
