@@ -59,7 +59,4 @@ jobs:
           exit 1
         fi
 
-        curl -X POST -H "Authorization: Bearer $TOKEN" \
-          -H "x-goog-user-project: $APIGEE_ORG" \
-          -H "service-account: $SERVICE_ACCOUNT_EMAIL" \
-          "https://apigee.googleapis.com/v1/organizations/$APIGEE_ORG/environments/$APIGEE_ENV/apis/$API_NAME/revisions/$REVISION/deployments"
+        gcloud apigee apis deploy $REVISION --api=$API_NAME --environment=$APIGEE_ENV --service-account=$SERVICE_ACCOUNT_EMAIL
