@@ -1,4 +1,4 @@
-name: Cloud Loggin  # Name of the Folder used
+name: Deploy Apigee Proxy  # Name of the Folder used
 
 on:
   push:
