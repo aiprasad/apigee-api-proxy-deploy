@@ -42,7 +42,7 @@ jobs:
     - name: Import and Deploy Apigee Proxy
       env:
         APIGEE_ORG: apigee-412820
-        APIGEE_ENV: eval
+        APIGEE_ENV: eval-2
         API_NAME: basic-caching
         GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
       run: |
